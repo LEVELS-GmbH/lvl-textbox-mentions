@@ -1,0 +1,13 @@
+{
+  "generator-angular-library": {
+    "githubUsername": "jeffersonsouza",
+    "githubRepoName": "textbox-mentions",
+    "npmModuleName": "textbox-mentions",
+    "ngModuleName": "TextboxMentionsModule",
+    "selectorPrefix": "lvls",
+    "projectTitle": "Textbox Mentions",
+    "projectDescription": "Angular mentions for textarea fields.",
+    "authorName": "Jefferson Souza",
+    "packageManager": "yarn"
+  }
+}
