@@ -1,6 +1,6 @@
 {
-  "name": "textbox-mentions",
-  "version": "0.0.13",
+  "name": "@levelsone/lvl-textbox-mentions",
+  "version": "0.0.14",
   "description": "Angular mentions for textarea fields.",
   "scripts": {
     "start": "concurrently --raw \"webpack-dev-server --open\" \"npm run test:watch\"",
@@ -44,7 +44,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jeffersonsouza/textbox-mentions.git"
+    "url": "git+https://github.com/LEVELS-GmbH/lvl-textbox-mentions.git"
   },
   "keywords": [
     "angular5",
@@ -55,9 +55,9 @@
   "author": "Jefferson Souza",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jeffersonsouza/textbox-mentions/issues"
+    "url": "https://github.com/LEVELS-GmbH/lvl-textbox-mentions/issues"
   },
-  "homepage": "https://github.com/jeffersonsouza/textbox-mentions#readme",
+  "homepage": "https://github.com/LEVELS-GmbH/lvl-textbox-mentions#readme",
   "devDependencies": {
     "@angular/common": "^5.0.0",
     "@angular/compiler": "^5.0.0",
