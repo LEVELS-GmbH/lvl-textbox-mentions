@@ -68,7 +68,7 @@ export class TextboxMentionsComponent implements OnInit {
 
     el.style.display = 'flex';
     el.style.position = 'absolute';
-    el.style.width = nativeParentElement.offsetWidth + 'px';
+    el.style.width = (nativeParentElement.offsetWidth > 50) ? nativeParentElement.offsetWidth + 'px' : '100%';
     el.style.height = '100px';
     el.style.top = (nativeParentElement.offsetTop - 100) + 'px';
     el.style.left = nativeParentElement.offsetLeft + 'px';

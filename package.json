@@ -1,6 +1,6 @@
 {
   "name": "textbox-mentions",
-  "version": "0.0.8",
+  "version": "0.0.13",
   "description": "Angular mentions for textarea fields.",
   "scripts": {
     "start": "concurrently --raw \"webpack-dev-server --open\" \"npm run test:watch\"",

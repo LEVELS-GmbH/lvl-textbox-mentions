@@ -44,6 +44,7 @@ export class MentionDirective implements OnChanges {
   }
 
   @Output() searchTerm = new EventEmitter();
+  @Output() selectedItem = new EventEmitter();
 
   constructor(
     private elementRef: ElementRef,
@@ -93,6 +94,8 @@ export class MentionDirective implements OnChanges {
   onKeyup(event: any, nativeElement: HTMLTextAreaElement | any = this.el) {
     if(nativeElement.tagName === 'ION-TEXTAREA') { nativeElement = nativeElement.getElementsByTagName('textarea')[0]; }
     if (event !== undefined) {
+      if(nativeElement.selectionEnd < this.lastTriggerAt) { this.mentionItems.hide(); }
+
       if (event.keyCode === KEY_LEFT || event.keyCode === KEY_RIGHT) {
         if (this.shouldBind(event, nativeElement)) {
           this.triggered = true;
@@ -110,6 +113,14 @@ export class MentionDirective implements OnChanges {
         }
       }
     }
+  }
+
+  @HostListener('blur', ['onBlur($event)'])
+  onBlur(event: any, nativeElement: HTMLTextAreaElement | any = this.el) {
+    setTimeout(() => {
+        this.mentionItems.hide();
+    }, 500);
+
   }
 
   emit() {
@@ -163,9 +174,19 @@ export class MentionDirective implements OnChanges {
 
       this.mentionItems.itemClick.subscribe(
         data => {
+          if(nativeElement.tagName === 'ION-TEXTAREA') { nativeElement = nativeElement.getElementsByTagName('textarea')[0]; }
+
+          this.selectedItem.emit({
+            item: this.mentionItems.item.name,
+            lastTriggerAt: this.lastTriggerAt,
+            lastTriggerChar: this.lastTriggerChar,
+            selectionEnd: nativeElement.selectionEnd
+          });
+
           nativeElement.value = nativeElement.value.substring(0, this.lastTriggerAt) + this.lastTriggerChar + this.mentionItems.item.name + nativeElement.value.substring(nativeElement.selectionEnd, nativeElement.value.length);
           nativeElement.focus();
           this.mentionItems.hide();
+          this.items = [];
         }
       );
 
