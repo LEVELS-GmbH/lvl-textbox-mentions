@@ -64,7 +64,7 @@ export class TextboxMentionsComponent implements OnInit {
   ngOnInit;
 
   position(nativeParentElement: HTMLTextAreaElement) {
-    let el: HTMLElement = this._element.nativeElement.getElementsByTagName('textarea')[0];
+    let el: HTMLElement = this._element.nativeElement;
 
     el.style.display = 'none';
     el.style.position = 'absolute';
