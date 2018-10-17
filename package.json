@@ -1,6 +1,6 @@
 {
   "name": "@levelsone/lvl-textbox-mentions",
-  "version": "0.0.14",
+  "version": "0.0.16",
   "description": "Angular mentions for textarea fields.",
   "scripts": {
     "start": "concurrently --raw \"webpack-dev-server --open\" \"npm run test:watch\"",

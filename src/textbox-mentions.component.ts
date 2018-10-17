@@ -10,7 +10,6 @@ import {ListItem} from './list-item';
     }`,
       `ul {
       list-style-type: none;
-      width: 100%;
       display: inline-block;
       align-self: flex-end;
     }`,
@@ -43,7 +42,7 @@ import {ListItem} from './list-item';
   template: `
     <ul #list *ngIf="hidden">
       <li *ngFor="let item of items" (click)="selectItem(item); itemClick.emit();">
-        <a class="dropdown-item" >
+        <a class="dropdown-item">
           {{item.name}}
         </a>
       </li>
@@ -59,14 +58,15 @@ export class TextboxMentionsComponent implements OnInit {
 
   @ViewChild('list') list: ElementRef;
 
-  constructor(private _element: ElementRef) {}
+  constructor(private _element: ElementRef) {
+  }
 
   ngOnInit;
 
   position(nativeParentElement: HTMLTextAreaElement) {
-    let el: HTMLElement = this._element.nativeElement;
+    let el: HTMLElement = this._element.nativeElement.getElementsByTagName('textarea')[0];
 
-    el.style.display = 'flex';
+    el.style.display = 'none';
     el.style.position = 'absolute';
     el.style.width = (nativeParentElement.offsetWidth > 50) ? nativeParentElement.offsetWidth + 'px' : '100%';
     el.style.height = '100px';
@@ -75,10 +75,12 @@ export class TextboxMentionsComponent implements OnInit {
   }
 
   show() {
+    this._element.nativeElement.style.display = 'flex';
     this.hidden = true;
   }
 
   hide() {
+    this._element.nativeElement.style.display = 'none';
     this.hidden = false;
   }
 
