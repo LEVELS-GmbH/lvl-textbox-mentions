@@ -1,5 +1,6 @@
-import {Component, ElementRef, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, HostListener, OnInit, Output, ViewChild} from '@angular/core';
 import {ListItem} from './list-item';
+
 
 @Component({
   selector: 'lvls-textbox-mentions',
@@ -8,51 +9,82 @@ import {ListItem} from './list-item';
       margin: 0;
       padding: 0;
     }`,
-      `ul {
+    `ul {
       list-style-type: none;
+      width: 100%;
       display: inline-block;
-      align-self: flex-end;
+      
     }`,
-
-      `h3 {
+    `ul:before {
+      content: attr(title);
+      color: #777;
+      background: #ddd;
+      border-top: #ccc solid 1px;
+      border-bottom: #ccc solid 1px;
+      display: block;
+      padding: 2px 10px;
+      font-weight: bold;
+    }`,
+    `h3 {
       font: bold 14px/1.5 Helvetica, Verdana, sans-serif;
     }`,
 
-      `li img {
+    `li img {
       float: left;
-      margin: 0 15px 0 0;
+      margin: 0 5px 0 0;
     }`,
-
-      `li p {
+    `li p {
       font: 200 11px/1.5 sans-serif;
     }`,
-
+    `li a {
+      color: #333;
+    }`,
+    `li a span {
+      color: #bbb;
+    }`,
       `li {
       padding: 5px;
       overflow: auto;
       text-align: left;
-      background: #fdfdfd;
       color: #333;
-      border-bottom: 1px #f9f9f9 solid;
+      border-bottom: 1px #fff solid;
+      background: #f7f7f7;
     }`,
-      `li:hover {
+
+    `li a {
+      color: #333;
+       
+    }`,
+    `li:hover {
       background: #eee;
       cursor: pointer;
+    }`,
+    `.badge-image, .profile-image {
+      width: 25px;
+    }`,
+    `.align-end {align-self: flex-end; }`,
+    `.profile-image {
+      border-radius: 50%;
     }`],
   template: `
-    <ul #list *ngIf="hidden">
+    <ul #list *ngIf="hidden" title="  Suggestions" [class.align-end]="listPosition === 'top'">
       <li *ngFor="let item of items" (click)="selectItem(item); itemClick.emit();">
         <a class="dropdown-item">
-          {{item.name}}
+          <img [src]="item.badgeImage" alt="badge" class="badge-image">
+          <img [src]="item.profilePhoto" alt="profile image" class="profile-image">
+          {{item.name ? item.name : item.nickname}}
+          <span *ngIf="item.name">{{item.nickname}}</span>
         </a>
       </li>
     </ul>
   `
 })
 export class TextboxMentionsComponent implements OnInit {
-  items = [];
-  item: ListItem;
-  hidden = true;
+  public items: ListItem[] = [];
+  public item: ListItem;
+  public hidden = true;
+  public nativeElement: HTMLTextAreaElement;
+  public listPosition: any = '';
 
   @Output() itemClick = new EventEmitter();
 
@@ -61,17 +93,35 @@ export class TextboxMentionsComponent implements OnInit {
   constructor(private _element: ElementRef) {
   }
 
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    console.log((this.nativeElement.offsetTop - this.nativeElement.scrollHeight));
+    this._element.nativeElement.style.top = ((this.nativeElement.scrollHeight - this.nativeElement.offsetTop) - 20) + 'px'
+  }
+
   ngOnInit;
 
-  position(nativeParentElement: HTMLTextAreaElement) {
+  position(nativeParentElement: HTMLTextAreaElement, position: string = 'top') {
+    this.listPosition = position;
+
     let el: HTMLElement = this._element.nativeElement;
 
+    // el.style.background = 'transparent';
     el.style.display = 'none';
-    el.style.position = 'absolute';
-    el.style.width = (nativeParentElement.offsetWidth > 50) ? nativeParentElement.offsetWidth + 'px' : '100%';
+    el.style.width = (this.nativeElement.offsetWidth > 50) ? this.nativeElement.offsetWidth + 'px' : '100%';
     el.style.height = '100px';
-    el.style.top = (nativeParentElement.offsetTop - 100) + 'px';
-    el.style.left = nativeParentElement.offsetLeft + 'px';
+
+    if (position === 'top') {
+      el.style.position = 'absolute';
+      el.style.top = (this.nativeElement.offsetTop - 100) + 'px';
+      // el.style.left = nativeParentElement.offsetLeft + 'px';
+    }
+    else {
+      el.style.position = 'absolute';
+      el.style.top = this.nativeElement.style.height + 'px';
+    }
+    el.style.width = '100%';
+    el.style.left = '0px';
   }
 
   show() {
@@ -84,7 +134,7 @@ export class TextboxMentionsComponent implements OnInit {
     this.hidden = false;
   }
 
-  selectItem(item) {
+  selectItem(item: any) {
     this.item = item;
     this.hide();
   }

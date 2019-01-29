@@ -5,12 +5,13 @@ import {
   HostListener,
   Output,
   EventEmitter,
-  ComponentFactoryResolver, Input, OnChanges, SimpleChanges
+  ComponentFactoryResolver, Input, OnChanges, SimpleChanges, OnInit
 } from '@angular/core';
 import {TextboxMentionsComponent} from './textbox-mentions.component';
 import {ListItem} from './list-item';
 
 const ACCEPTED_EVENTS: any = [
+  'input',
   'insertText',
   'insertFromPaste',
   'insertFromDrop',
@@ -25,7 +26,7 @@ const KEY_RIGHT = 39;
 const KEY_DOWN = 40;
 
 @Directive({selector: '[lvlsMention]'})
-export class MentionDirective implements OnChanges {
+export class MentionDirective implements OnChanges, OnInit {
 
   // the character that will trigger the menu behavior
   private defaultTriggerChar: any = ['@', '#'];
@@ -43,6 +44,8 @@ export class MentionDirective implements OnChanges {
     this.items = mentionItems;
   }
 
+  @Input() mentionsPosition: string;
+
   @Output() searchTerm = new EventEmitter();
   @Output() selectedItem = new EventEmitter();
 
@@ -52,7 +55,12 @@ export class MentionDirective implements OnChanges {
     private viewContainerRef: ViewContainerRef
   ) {
     this.el = this.elementRef.nativeElement;
-    this.showSearchList(this.elementRef.nativeElement);
+    this.createSearchList(this.el);
+  }
+
+  ngOnInit() {
+    this.mentionItems.position(this.el, this.mentionsPosition);
+    // this.mentionItems.show();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -64,7 +72,7 @@ export class MentionDirective implements OnChanges {
   keyHandler(event: any, nativeElement: HTMLTextAreaElement | any = this.el) {
     if(nativeElement.tagName === 'ION-TEXTAREA') { nativeElement = nativeElement.getElementsByTagName('textarea')[0]; }
     if (event !== undefined) {
-      if (ACCEPTED_EVENTS.includes(event.inputType)) {
+      if (ACCEPTED_EVENTS.includes(event.inputType || event.type)) {
         if (this.shouldBind(event, nativeElement)) {
           this.triggered = true;
           this.lastTriggerAt = this.nearestBindable(nativeElement);
@@ -153,9 +161,9 @@ export class MentionDirective implements OnChanges {
   }
 
   nearestBindable(nativeElement: HTMLTextAreaElement): any {
-    let bindAt;
+    let bindAt: any;
 
-    this.defaultTriggerChar.forEach((value) => {
+    this.defaultTriggerChar.forEach((value: any) => {
       if (bindAt === undefined || nativeElement.value.lastIndexOf(value, nativeElement.selectionEnd) > bindAt) {
         bindAt = nativeElement.value.lastIndexOf(value, nativeElement.selectionEnd);
       }
@@ -164,29 +172,33 @@ export class MentionDirective implements OnChanges {
     return bindAt;
   }
 
-  showSearchList(nativeElement: HTMLTextAreaElement) {
+  createSearchList(nativeElement: HTMLTextAreaElement) {
       const componentFactory = this.componentResolver.resolveComponentFactory(TextboxMentionsComponent);
       const componentRef = this.viewContainerRef.createComponent(componentFactory);
       this.mentionItems = componentRef.instance;
       this.mentionItems.items = this.items;
-      this.mentionItems.position(nativeElement);
-      this.mentionItems.show();
+      this.mentionItems.nativeElement = nativeElement;
 
       this.mentionItems.itemClick.subscribe(
         data => {
           if(nativeElement.tagName === 'ION-TEXTAREA') { nativeElement = nativeElement.getElementsByTagName('textarea')[0]; }
 
           this.selectedItem.emit({
-            item: this.mentionItems.item.name,
+            item: this.mentionItems.item.nickname,
             lastTriggerAt: this.lastTriggerAt,
             lastTriggerChar: this.lastTriggerChar,
             selectionEnd: nativeElement.selectionEnd
           });
 
-          nativeElement.value = nativeElement.value.substring(0, this.lastTriggerAt) + this.lastTriggerChar + this.mentionItems.item.name + nativeElement.value.substring(nativeElement.selectionEnd, nativeElement.value.length);
+          nativeElement.value = nativeElement.value.substring(0, this.lastTriggerAt) + this.lastTriggerChar + this.mentionItems.item.nickname + nativeElement.value.substring(nativeElement.selectionEnd, nativeElement.value.length);
           nativeElement.focus();
           this.mentionItems.hide();
           this.items = [];
+
+          this.triggered = false; // @todo
+
+          nativeElement.selectionStart = nativeElement.value.length;
+          nativeElement.selectionEnd = nativeElement.value.length;
         }
       );
 
